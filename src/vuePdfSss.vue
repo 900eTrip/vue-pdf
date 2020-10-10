@@ -1,26 +1,23 @@
 <style src="./annotationLayer.css"></style>
 <script>
 
-    import componentFactory from './componentFactory.js'
-    // 修改部分：引入pdfjsworker
-    import PdfjsWorker from 'pdfjs-dist/build/pdf.worker.js'
+	import componentFactory from './componentFactory'
+	import pdfjsWrapper from './pdfjsWrapper'
 
-    if ( process.env.VUE_ENV !== 'server' ) {
+	var PDFJS = require('pdfjs-dist/es5/build/pdf.js');
 
-        var pdfjsWrapper = require('./pdfjsWrapper.js').default;
-        var PDFJS = require('pdfjs-dist/es5/build/pdf.js');
+	if ( process.env.VUE_ENV !== 'server' ) {
 
-        if ( typeof window !== 'undefined' && 'Worker' in window && navigator.appVersion.indexOf('MSIE 10') === -1 ) {
-            // 修改部分：注释原本的引入方法
-            // var PdfjsWorker = require('worker-loader!pdfjs-dist/es5/build/pdf.worker.js');
-            PDFJS.GlobalWorkerOptions.workerPort = new PdfjsWorker();
-        }
+		if ( typeof window !== 'undefined' && 'Worker' in window ) {
 
-        var component = componentFactory(pdfjsWrapper(PDFJS));
-    } else {
+			var PdfjsWorker = require('worker-loader!pdfjs-dist/es5/build/pdf.worker.js');
+			PDFJS.GlobalWorkerOptions.workerPort = new PdfjsWorker();
+		}
+	}
 
-        var component = componentFactory({});
-    }
+	var component = componentFactory(pdfjsWrapper(PDFJS));
+	component.PDFJS = PDFJS;
 
-    export default component;
+	export default component;
+
 </script>
